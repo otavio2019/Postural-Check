@@ -247,10 +247,11 @@ export default function Home() {
 
           {resultado && (
             <div role="status" aria-live="polite" className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
-              <p className="font-semibold">{resultado.mensagem}</p>
-              <p className="mt-2">Frente: {resultado.imagens.frente.nome_arquivo}</p>
-              <p>Lateral: {resultado.imagens.lateral.nome_arquivo}</p>
-              <p>Costas: {resultado.imagens.costas.nome_arquivo}</p>
+              <p>Nome: {resultado.nome}</p>
+              <p className="mt-2">Status: <span className="font-semibold">Imagens recebidas com sucesso</span></p>
+              <p className="mt-2">Imagem-1 entregue</p>
+              <p>Imagem-2 entregue</p>
+              <p>Imagem-3 entregue</p>
             </div>
           )}
         </form>
