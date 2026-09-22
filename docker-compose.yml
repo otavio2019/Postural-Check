@@ -46,7 +46,7 @@ services:
     image: postgres:17-alpine
     container_name: postural-check-postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_DB: postural_check
       POSTGRES_USER: postural_check

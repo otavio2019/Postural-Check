@@ -1,6 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
+
+
 
 type Resultado = {
   mensagem: string;
@@ -20,7 +22,37 @@ export default function Home() {
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [imagem, setImagem] = useState<File | null>(null);
+  const [mensagemUpload, setMensagemUpload] = useState("");
+  
+  function selecionarImagem(event: ChangeEvent<HTMLInputElement>) {
+    const arquivo = event.target.files?.[0] ?? null;
 
+    setErro("");
+    setMensagemUpload("");
+
+    if (!arquivo) {
+      setImagem(null);
+      return;
+    }
+
+    if (!arquivo.type.startsWith("image/")) {
+      setImagem(null);
+      setErro("Selecione um arquivo de imagem.");
+      return;
+    }
+
+    const tamanhoMaximo = 10 * 1024 * 1024;
+
+    if (arquivo.size > tamanhoMaximo) {
+      setImagem(null);
+      setErro("A imagem deve ter no máximo 10 MB.");
+      return;
+    }
+
+    setImagem(arquivo);
+  }
+  
   async function enviarAnalise(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     // Limpa o estado anterior para que cada envio represente uma nova análise.
@@ -69,11 +101,20 @@ export default function Home() {
             <label className="space-y-2 text-sm font-medium text-slate-200">
               Nome
               <input
-                required
+               required
                 minLength={2}
                 value={nome}
                 onChange={(event) => setNome(event.target.value)}
                 placeholder="Digite o nome"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-400"
+              />
+            </label>
+            <label className="space-y-2 text-sm font-medium text-slate-200">
+              Imagem
+              <input
+                type="file"
+                accept="image/*"
+                onChange={selecionarImagem}
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-400"
               />
             </label>
