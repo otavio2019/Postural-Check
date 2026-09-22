@@ -16,6 +16,8 @@ O **Postural Check** é uma aplicação web em desenvolvimento para apoiar a an�
 - Endpoint `POST /analise-postural` para receber nome, idade e observações.
 - Validação dos dados recebidos com Pydantic.
 - Formulário inicial conectado ao backend usando `fetch`.
+- Campo de seleção de imagem adicionado ao formulário.
+- Validação inicial no frontend para aceitar imagens e limitar o tamanho a 10 MB.
 - Mensagens de carregamento, sucesso e erro no frontend.
 - CORS configurado para `localhost:3000` e `127.0.0.1:3000`.
 - Docker Compose configurado para frontend, backend, PostgreSQL e MinIO.
@@ -26,20 +28,19 @@ O **Postural Check** é uma aplicação web em desenvolvimento para apoiar a an�
 
 A implementação está no início. As próximas tarefas são:
 
-1. Adicionar seleção de imagem no formulário.
+1. Conectar o campo de imagem ao envio usando `FormData`.
 2. Criar a rota `POST /analise-postural/imagem`.
 3. Validar extensão, tipo e tamanho da imagem no backend.
-4. Enviar a imagem do frontend usando `FormData`.
-5. Armazenar imagens no MinIO.
-6. Criar registros das análises no PostgreSQL.
-7. Processar a imagem para identificar pontos corporais.
-8. Calcular medidas e possíveis assimetrias posturais.
-9. Exibir o resultado da análise no frontend.
-10. Criar histórico e exclusão de análises.
-11. Adicionar testes automatizados.
-12. Revisar segurança, autenticação e proteção de dados antes de publicar.
+4. Armazenar imagens no MinIO.
+5. Criar registros das análises no PostgreSQL.
+6. Processar a imagem para identificar pontos corporais.
+7. Calcular medidas e possíveis assimetrias posturais.
+8. Exibir o resultado da análise no frontend.
+9. Criar histórico e exclusão de análises.
+10. Adicionar testes automatizados.
+11. Revisar segurança, autenticação e proteção de dados antes de publicar.
 
-A prioridade imediata é implementar o **upload de uma imagem sem análise automática**. Primeiro vamos confirmar que a imagem consegue percorrer corretamente o caminho `frontend → FastAPI → frontend`. A detecção postural será feita em uma etapa posterior.
+A prioridade imediata é conectar o campo de imagem já existente ao backend e implementar o **upload sem análise automática**. Atualmente, o frontend consegue selecionar e validar a imagem, mas a requisição ainda envia somente nome, idade e observações. A detecção postural será feita em uma etapa posterior.
 
 ## Tecnologias
 
@@ -254,16 +255,13 @@ Invoke-RestMethod `
 
 A próxima implementação será o upload de uma imagem. Ela será dividida em pequenas mudanças:
 
-1. Alterar `frontend/app/page.tsx` para adicionar um campo `input type="file"`.
-2. Guardar o arquivo selecionado em um estado React.
-3. Validar no frontend se o arquivo é uma imagem e se possui até 10 MB.
-4. Criar `backend/app/api/routes/postural.py`.
-5. Criar a rota `POST /analise-postural/imagem` usando `UploadFile`.
-6. Validar novamente o tipo e o tamanho no backend.
-7. Enviar a imagem com `FormData`.
-8. Testar primeiro em `http://localhost:8000/docs`.
-9. Testar depois pelo formulário do frontend.
-10. Somente após o upload funcionar, adicionar o armazenamento no MinIO.
+1. Atualizar `frontend/app/page.tsx` para incluir a imagem no envio usando `FormData`.
+2. Criar `backend/app/api/routes/postural.py`.
+3. Criar a rota `POST /analise-postural/imagem` usando `UploadFile`.
+4. Validar novamente o tipo e o tamanho no backend.
+5. Testar primeiro em `http://localhost:8000/docs`.
+6. Testar depois pelo formulário do frontend.
+7. Somente após o upload funcionar, adicionar o armazenamento no MinIO.
 
 O resultado esperado da primeira versão do upload será semelhante a:
 
