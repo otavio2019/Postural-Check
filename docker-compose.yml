@@ -55,7 +55,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   minio:
-    image: minio/minio:RELEASE.2026-09-07T16-13-09Z
+    image: minio/minio:latest
     container_name: postural-check-minio
     command: server /data --console-address ":9001"
     ports:
