@@ -5,6 +5,7 @@ from app.schemas.postural import AnalisePosturalRequest
 api_router = APIRouter()
 
 
+# Endpoint simples para confirmar que a aplicação foi iniciada corretamente.
 @api_router.get("/")
 def inicio():
     """Retorna uma mensagem inicial da API."""
@@ -17,6 +18,8 @@ def verificar_saude():
     return {"status": "ok"}
 
 
+# Nesta primeira versão, a rota apenas valida e devolve os dados recebidos.
+# A análise real será delegada posteriormente a um serviço de domínio.
 @api_router.post("/analise-postural")
 def analisar_postura(dados: AnalisePosturalRequest):
     """Recebe os dados básicos para iniciar uma análise postural."""

@@ -9,6 +9,8 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# O frontend local roda em outra origem (porta 3000), por isso precisa de
+# permissão explícita para acessar a API durante o desenvolvimento.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -17,4 +19,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mantém as rotas agrupadas em um único módulo para facilitar a expansão da API.
 app.include_router(api_router)

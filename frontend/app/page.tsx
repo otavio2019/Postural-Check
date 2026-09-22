@@ -10,6 +10,7 @@ type Resultado = {
   resultado: string;
 };
 
+// Permite apontar para a API do ambiente sem alterar o código do frontend.
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
 
   async function enviarAnalise(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // Limpa o estado anterior para que cada envio represente uma nova análise.
     setEnviando(true);
     setErro("");
     setResultado(null);
@@ -41,6 +43,7 @@ export default function Home() {
         throw new Error("Confira os dados informados e tente novamente.");
       }
 
+      // O backend retorna um payload temporário até a análise postural existir.
       const dados: Resultado = await resposta.json();
       setResultado(dados);
     } catch (error) {

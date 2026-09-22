@@ -6,6 +6,7 @@ services:
     container_name: postural-check-frontend
     working_dir: /app
     command: npm run dev -- --hostname 0.0.0.0
+    # Expõe o servidor de desenvolvimento e preserva o hot reload dos arquivos locais.
     ports:
       - "3000:3000"
     volumes:
@@ -23,6 +24,7 @@ services:
     container_name: postural-check-backend
     working_dir: /app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # O código montado em /app permite que o reload do Uvicorn acompanhe o host.
     ports:
       - "8000:8000"
     volumes:
@@ -66,6 +68,7 @@ services:
       - minio_data:/data
 
 volumes:
+  # Volumes nomeados evitam reinstalar dependências e perder dados a cada subida.
   frontend_node_modules:
   postgres_data:
   minio_data:
