@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postural-check-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postural_check
+      POSTGRES_USER: postural_check
+      POSTGRES_PASSWORD: postural_check
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postural-check-net
+
+  minio:
+    image: minio/minio:latest
+    container_name: postural-check-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - postural-check-net
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  postural-check-net:
+    driver: bridge
