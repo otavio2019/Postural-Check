@@ -298,7 +298,7 @@ Invoke-RestMethod `
 
 ## Próxima tarefa detalhada
 
-A próxima implementação será registrar os metadados das análises no PostgreSQL. O armazenamento privado das três imagens já está disponível e funciona assim:
+A migração para registrar os metadados das análises no PostgreSQL com Prisma já começou. O armazenamento privado das três imagens continua disponível e o novo backend Node aplica a migration automaticamente no Compose.
 
 1. Selecionar uma foto frontal, lateral e de costas no frontend.
 2. Enviar as três imagens usando `FormData`.
@@ -306,7 +306,7 @@ A próxima implementação será registrar os metadados das análises no Postgre
 4. Validar tipo, extensão, assinatura e tamanho no backend.
 5. Testar em `http://localhost:8000/docs` e pelo formulário do frontend.
 6. Salvar as três imagens no bucket privado `postural-images` do MinIO.
-7. Criar o registro correspondente no PostgreSQL.
+7. Criar o registro correspondente no PostgreSQL usando Prisma.
 
 O resultado esperado da primeira versão do upload será semelhante a:
 

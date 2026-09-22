@@ -1,13 +1,16 @@
-FROM python:3.12-slim
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY backend/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+COPY backend/package.json backend/package-lock.json ./
+RUN npm ci
 
-COPY backend/ ./
+COPY backend/prisma ./prisma
+COPY backend/tsconfig.json ./
+COPY backend/src ./src
+
+RUN npx prisma generate
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["npm", "run", "dev"]

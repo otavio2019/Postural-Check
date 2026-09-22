@@ -23,13 +23,15 @@ services:
       dockerfile: docker/backend/Dockerfile
     container_name: postural-check-backend
     working_dir: /app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    # O código montado em /app permite que o reload do Uvicorn acompanhe o host.
+    command: sh -c "npx prisma migrate deploy && npm run dev"
+    # O código montado em /app permite que o reload do tsx acompanhe o host.
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - backend_node_modules:/app/node_modules
     environment:
+      DATABASE_URL: postgresql://postural_check:postural_check@postgres:5432/postural_check?schema=public
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
       POSTGRES_DB: postural_check
@@ -41,8 +43,10 @@ services:
       MINIO_BUCKET: postural-images
       MINIO_SECURE: "false"
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
 
   postgres:
     image: postgres:17-alpine
@@ -55,6 +59,11 @@ services:
       POSTGRES_PASSWORD: postural_check
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postural_check -d postural_check"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   minio:
     image: quay.io/minio/minio:latest
@@ -72,5 +81,6 @@ services:
 volumes:
   # Volumes nomeados evitam reinstalar dependências e perder dados a cada subida.
   frontend_node_modules:
+  backend_node_modules:
   postgres_data:
   minio_data:
