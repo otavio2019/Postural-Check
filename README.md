@@ -116,7 +116,7 @@ Acesse os serviços nestes endereços:
 | Documentação da API | http://localhost:8000/docs |
 | MinIO API | http://localhost:9000 |
 | Console do MinIO | http://localhost:9001 |
-| PostgreSQL | localhost:5432 |
+| PostgreSQL | localhost:5433 |
 
 As credenciais locais configuradas para o console do MinIO são:
 
@@ -225,6 +225,44 @@ Exemplo de requisição:
 
 Neste momento, a resposta confirma o recebimento dos dados, mas ainda não apresenta uma análise postural real.
 
+### `POST /analise-postural/imagem`
+
+Recebe os dados do paciente e três imagens posturais usando `multipart/form-data`:
+
+- `imagem_frente`;
+- `imagem_lateral`;
+- `imagem_costas`.
+
+Cada imagem deve ser JPEG, PNG ou WEBP e ter no máximo 10 MB. O backend valida os três arquivos, mas ainda não os armazena no MinIO nem realiza análise automática.
+
+Exemplo de resposta:
+
+```json
+{
+  "mensagem": "As três imagens foram recebidas com sucesso",
+  "nome": "Otavio",
+  "idade": 21,
+  "observacoes": "Teste",
+  "imagens": {
+    "frente": {
+      "nome_arquivo": "frente.jpg",
+      "tipo": "image/jpeg",
+      "tamanho": 245678
+    },
+    "lateral": {
+      "nome_arquivo": "lateral.jpg",
+      "tipo": "image/jpeg",
+      "tamanho": 238921
+    },
+    "costas": {
+      "nome_arquivo": "costas.jpg",
+      "tipo": "image/jpeg",
+      "tamanho": 251004
+    }
+  }
+}
+```
+
 ## Como testar a API
 
 Abra a documentação automática:
@@ -253,23 +291,25 @@ Invoke-RestMethod `
 
 ## Próxima tarefa detalhada
 
-A próxima implementação será o upload de uma imagem. Ela será dividida em pequenas mudanças:
+A próxima implementação será o armazenamento privado das três imagens. O upload inicial já está disponível e é dividido em:
 
-1. Atualizar `frontend/app/page.tsx` para incluir a imagem no envio usando `FormData`.
-2. Criar `backend/app/api/routes/postural.py`.
-3. Criar a rota `POST /analise-postural/imagem` usando `UploadFile`.
-4. Validar novamente o tipo e o tamanho no backend.
-5. Testar primeiro em `http://localhost:8000/docs`.
-6. Testar depois pelo formulário do frontend.
-7. Somente após o upload funcionar, adicionar o armazenamento no MinIO.
+1. Selecionar uma foto frontal, lateral e de costas no frontend.
+2. Enviar as três imagens usando `FormData`.
+3. Receber as três com `UploadFile`.
+4. Validar tipo, extensão, assinatura e tamanho no backend.
+5. Testar em `http://localhost:8000/docs` e pelo formulário do frontend.
+6. Adicionar o armazenamento privado no MinIO.
 
 O resultado esperado da primeira versão do upload será semelhante a:
 
 ```json
 {
-  "mensagem": "Imagem recebida com sucesso",
-  "nome_arquivo": "foto-postura.jpg",
-  "tipo": "image/jpeg"
+  "mensagem": "As três imagens foram recebidas com sucesso",
+  "imagens": {
+    "frente": { "nome_arquivo": "frente.jpg" },
+    "lateral": { "nome_arquivo": "lateral.jpg" },
+    "costas": { "nome_arquivo": "costas.jpg" }
+  }
 }
 ```
 
