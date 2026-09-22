@@ -233,31 +233,36 @@ Recebe os dados do paciente e três imagens posturais usando `multipart/form-dat
 - `imagem_lateral`;
 - `imagem_costas`.
 
-Cada imagem deve ser JPEG, PNG ou WEBP e ter no máximo 10 MB. O backend valida os três arquivos, mas ainda não os armazena no MinIO nem realiza análise automática.
+Cada imagem deve ser JPEG, PNG ou WEBP e ter no máximo 10 MB. O backend valida os três arquivos e os armazena em um bucket privado do MinIO. A análise postural automática ainda não foi implementada.
 
 Exemplo de resposta:
 
 ```json
 {
-  "mensagem": "As três imagens foram recebidas com sucesso",
+  "mensagem": "As três imagens foram armazenadas com sucesso",
   "nome": "Otavio",
   "idade": 21,
   "observacoes": "Teste",
+  "status": "imagens_armazenadas",
+  "analise_id": "a1b2c3d4e5f6",
   "imagens": {
     "frente": {
       "nome_arquivo": "frente.jpg",
       "tipo": "image/jpeg",
-      "tamanho": 245678
+      "tamanho": 245678,
+      "caminho": "analises/a1b2c3d4e5f6/frente.jpg"
     },
     "lateral": {
       "nome_arquivo": "lateral.jpg",
       "tipo": "image/jpeg",
-      "tamanho": 238921
+      "tamanho": 238921,
+      "caminho": "analises/a1b2c3d4e5f6/lateral.jpg"
     },
     "costas": {
       "nome_arquivo": "costas.jpg",
       "tipo": "image/jpeg",
-      "tamanho": 251004
+      "tamanho": 251004,
+      "caminho": "analises/a1b2c3d4e5f6/costas.jpg"
     }
   }
 }
@@ -291,14 +296,15 @@ Invoke-RestMethod `
 
 ## Próxima tarefa detalhada
 
-A próxima implementação será o armazenamento privado das três imagens. O upload inicial já está disponível e é dividido em:
+A próxima implementação será registrar os metadados das análises no PostgreSQL. O armazenamento privado das três imagens já está disponível e funciona assim:
 
 1. Selecionar uma foto frontal, lateral e de costas no frontend.
 2. Enviar as três imagens usando `FormData`.
 3. Receber as três com `UploadFile`.
 4. Validar tipo, extensão, assinatura e tamanho no backend.
 5. Testar em `http://localhost:8000/docs` e pelo formulário do frontend.
-6. Adicionar o armazenamento privado no MinIO.
+6. Salvar as três imagens no bucket privado `postural-images` do MinIO.
+7. Criar o registro correspondente no PostgreSQL.
 
 O resultado esperado da primeira versão do upload será semelhante a:
 

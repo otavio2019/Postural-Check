@@ -1,7 +1,9 @@
 from pathlib import Path
+from uuid import uuid4
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
+from app.core.storage import ImagemValidada, MinioStorageError, storage
 from app.schemas.postural import AnalisePosturalRequest
 
 api_router = APIRouter()
@@ -42,7 +44,7 @@ def analisar_postura(dados: AnalisePosturalRequest):
     }
 
 
-async def validar_imagem(arquivo: UploadFile, nome_campo: str) -> int:
+async def validar_imagem(arquivo: UploadFile, nome_campo: str) -> ImagemValidada:
     """Valida metadados, extensão, assinatura e tamanho de uma imagem."""
     if not arquivo.filename:
         raise HTTPException(
@@ -77,7 +79,14 @@ async def validar_imagem(arquivo: UploadFile, nome_campo: str) -> int:
         )
 
     await arquivo.seek(0)
-    return len(conteudo)
+    extensao_normalizada = ".jpg" if arquivo.content_type == "image/jpeg" else extensao
+
+    return ImagemValidada(
+        nome_arquivo=arquivo.filename,
+        tipo=arquivo.content_type,
+        extensao=extensao_normalizada,
+        conteudo=conteudo,
+    )
 
 
 @api_router.post("/analise-postural/imagem")
@@ -89,31 +98,47 @@ async def analisar_postura_com_imagens(
     imagem_lateral: UploadFile = File(...),
     imagem_costas: UploadFile = File(...),
 ):
-    """Recebe e valida as três vistas, sem armazená-las ou analisá-las ainda."""
-    tamanho_frente = await validar_imagem(imagem_frente, "imagem_frente")
-    tamanho_lateral = await validar_imagem(imagem_lateral, "imagem_lateral")
-    tamanho_costas = await validar_imagem(imagem_costas, "imagem_costas")
+    """Recebe, valida e armazena as três vistas, sem analisá-las ainda."""
+    imagens = {
+        "frente": await validar_imagem(imagem_frente, "imagem_frente"),
+        "lateral": await validar_imagem(imagem_lateral, "imagem_lateral"),
+        "costas": await validar_imagem(imagem_costas, "imagem_costas"),
+    }
+    analise_id = uuid4().hex
+
+    try:
+        caminhos = storage.salvar_imagens(analise_id, imagens)
+    except MinioStorageError as error:
+        raise HTTPException(
+            status_code=503,
+            detail="Não foi possível armazenar as imagens no MinIO.",
+        ) from error
 
     return {
-        "mensagem": "As três imagens foram recebidas com sucesso",
+        "mensagem": "As três imagens foram armazenadas com sucesso",
         "nome": nome,
         "idade": idade,
         "observacoes": observacoes,
+        "status": "imagens_armazenadas",
+        "analise_id": analise_id,
         "imagens": {
             "frente": {
-                "nome_arquivo": imagem_frente.filename,
-                "tipo": imagem_frente.content_type,
-                "tamanho": tamanho_frente,
+                "nome_arquivo": imagens["frente"].nome_arquivo,
+                "tipo": imagens["frente"].tipo,
+                "tamanho": imagens["frente"].tamanho,
+                "caminho": caminhos["frente"],
             },
             "lateral": {
-                "nome_arquivo": imagem_lateral.filename,
-                "tipo": imagem_lateral.content_type,
-                "tamanho": tamanho_lateral,
+                "nome_arquivo": imagens["lateral"].nome_arquivo,
+                "tipo": imagens["lateral"].tipo,
+                "tamanho": imagens["lateral"].tamanho,
+                "caminho": caminhos["lateral"],
             },
             "costas": {
-                "nome_arquivo": imagem_costas.filename,
-                "tipo": imagem_costas.content_type,
-                "tamanho": tamanho_costas,
+                "nome_arquivo": imagens["costas"].nome_arquivo,
+                "tipo": imagens["costas"].tipo,
+                "tamanho": imagens["costas"].tamanho,
+                "caminho": caminhos["costas"],
             },
         },
     }
