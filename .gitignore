@@ -17,6 +17,9 @@
 
 # backend
 /backend/.venv/
+/backend/node_modules/
+/backend/dist/
+/backend/*.tsbuildinfo
 /backend/__pycache__/
 /backend/.pytest_cache/
 /backend/.mypy_cache/

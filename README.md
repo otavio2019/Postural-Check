@@ -4,6 +4,8 @@ O **Postural Check** é uma aplicação web em desenvolvimento para apoiar a an�
 
 > **Estado atual:** a primeira integração entre o frontend e o backend está funcionando. O sistema já envia nome, idade e observações para a API. A análise postural por imagem ainda não foi implementada.
 
+> **Migração em andamento:** foi criada a base de um novo backend em Node.js/TypeScript com Prisma e PostgreSQL. O FastAPI continua sendo usado durante a migração gradual das rotas.
+
 ## Progresso do projeto
 
 ### O que já foi feito
