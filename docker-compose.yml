@@ -55,7 +55,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     container_name: postural-check-minio
     command: server /data --console-address ":9001"
     ports:
